@@ -1,0 +1,28 @@
+// فروش نام کاربری تلگرام با گارانتی بازگشتی به فروشنده
+// نام کاربری: Dr_psycho58
+// آدرس فروشنده (Base64): UQAthIWpZO1dDaIjRflCr-Yy529rkmkIERdiNonFKdXEnJ5M
+// توجه: آدرس بالا باید قبل از استفاده به فرمت hex/32-byte تبدیل شود.
+
+const int SELL_PRICE = 3000000000;    // ۳۰۰۰ TON-kepeer بر حسب nanoTON
+const int GUARANTEE_FEE = 100000000;  // ۱۰۰ TON-kepeer بر حسب nanoTON (قابل تغییر)
+
+// مثال hex آدرس؛ حتماً آن را با مقدار صحیح جایگزین کن
+cell seller_addr = x{51a1d215a593b57436888d17e50abf962cbdbd926924444883689dc52a709793};
+
+() recv_internal(slice in_msg_body, int in_value, cell in_sender_pubkey, slice in_sender_addr) impure {
+    // بررسی مبلغ ارسالی
+    if (in_value < SELL_PRICE) {
+        throw(101); // مبلغ کافی نیست
+    }
+
+    // پرداخت مبلغ منهای گارانتی به فروشنده
+    int payout = SELL_PRICE - GUARANTEE_FEE;
+    send_raw_message(seller_addr, payout, 0, in_msg_body);
+
+    // بازگرداندن گارانتی به فروشنده
+    send_raw_message(seller_addr, GUARANTEE_FEE, 0, in_msg_body);
+
+    // در عمل، ثبت یا انتقال نام کاربری باید خارج از زنجیره انجام شود.
+
+    return ();
+}
